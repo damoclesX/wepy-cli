@@ -61,6 +61,9 @@ export default {
 
                 if (util.isFile(rst[child.nodeName].src)) {
                     rst[child.nodeName].code = util.readFile(rst[child.nodeName].src, 'utf-8');
+                    if (rst[child.nodeName].code === null) {
+                        throw '打开文件失败: ' + rst[child.nodeName].src;
+                    }
                 } else {
                     [].slice.call(child.childNodes || []).forEach((c) => {
                         rst[child.nodeName].code += c.toString();
@@ -97,6 +100,10 @@ export default {
         let dist = cache.getDist();
         let pages = cache.getPages();
         let content = util.readFile(filepath);
+        if (content === null) {
+            throw new Error('打开文件失败: ' + filepath);
+            return;
+        }
         let doc = new DOMParser().parseFromString(content);
 
         let type = '';

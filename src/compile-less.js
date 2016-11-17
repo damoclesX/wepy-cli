@@ -19,7 +19,7 @@ export default {
                 });
             }
             let target = util.getDistPath(opath, 'wxss', src, dist);
-            util.log('LESS: ' + target, '写入');
+            util.log('LESS: ' + path.relative(process.cwd(), target), '写入');
             util.writeFile(target, res.css);
         }).catch((e) => {
             util.error(e);

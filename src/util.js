@@ -18,6 +18,8 @@ colors.setTheme({
     WARN: 'yellow',
     DEBUG: 'blue',
     ERROR: 'red',
+    '监听': 'magenta',
+    '错误': 'red',
     '拷贝': 'yellow',
     '编译': 'blue',
     '写入': 'green'
@@ -72,7 +74,13 @@ export default {
         return fs.statSync(p).isDirectory();
     },
     readFile (p) {
-        return fs.readFileSync(p, 'utf-8');
+        let rst = '';
+        try {
+            rst = fs.readFileSync(p, 'utf-8');
+        } catch (e) {
+            rst = null;
+        }
+        return rst;
     },
     writeFile (p, data) {
         let opath = path.parse(p);
@@ -121,10 +129,10 @@ export default {
     },
     getVersion () {
         let filepath = path.resolve(__dirname, '../package.json');
-        let version = JSON.parse(fs.readFileSync(filepath)).version;
+        let version = JSON.parse(this.readFile(filepath)).version;
         return version;
     },
-    datetime (date = new Date(), format = 'YYYY-MM-DD HH:mm:ss') {
+    datetime (date = new Date(), format = 'HH:mm:ss') {
         let fn = (d) => {
             return ('0' + d).slice(-2);
         };
@@ -156,7 +164,6 @@ export default {
             if(type === 'ERROR'){
                 console.error(colors.red('[Error] ' + msg));
                 console.log();
-                process.exit();
             } else {
                 let fn = colors[type] ? colors[type] : colors['info'];
                 console.log(dateTime + colors[type](`[${type}] `) + msg);

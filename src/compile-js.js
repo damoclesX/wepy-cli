@@ -82,7 +82,7 @@ export default {
             if (needCopy) {
                 if (!cache.checkBuildCache(source)) {
                     cache.setBuildCache(source);
-                    util.log('依赖: ' + target, '拷贝');
+                    util.log('依赖: ' + path.relative(process.cwd(), target), '拷贝');
                     /*let dirname = path.dirname(target);
                     mkdirp.sync(dirname);*/
 
@@ -119,6 +119,9 @@ export default {
         let config = util.getConfig();
         if (!code) {
             code = util.readFile(path.join(opath.dir, opath.base));
+            if (code === null) {
+                throw '打开文件失败: ' + path.join(opath.dir, opath.base);
+            }
         }
         if (type !== 'npm') {
             code = transform(code, config.babel).code;
@@ -142,11 +145,11 @@ export default {
 
         if (type !== 'npm') {
             let target = util.getDistPath(opath, 'js', src, dist);
-            util.log('JS: ' + target, '写入');
+            util.log('JS  : ' + path.relative(process.cwd(), target), '写入');
             util.writeFile(target, code);
         } else {
             let target = path.join(npmPath, path.relative(modulesPath, path.join(opath.dir, opath.base)));
-            util.log('JS: ' + target, '写入');
+            util.log('JS  : ' + path.relative(process.cwd(), target), '写入');
             util.writeFile(target, code);
         }
 

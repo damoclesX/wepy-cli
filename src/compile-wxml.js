@@ -1,4 +1,5 @@
 import {DOMParser, DOMImplementation} from 'xmldom';
+import path from 'path';
 import util from './util';
 import cache from './cache';
 
@@ -8,9 +9,20 @@ const JOIN = '$';
 export default {
     comPrefix: {},
     comCount: 0,
+    getPrefix (prefix) {
+        return prefix;
+        if (this.comPrefix[prefix])
+            return this.comPrefix[prefix];
+        this.comPrefix[prefix] = this.comCount++;
+        return this.comPrefix[prefix];
+    },
     getTemplate (src) {
+        let content = util.readFile(src);
+        if (content === null) {
+            throw '打开文件失败: ' + content;
+        }
         let doc = new DOMImplementation().createDocument();
-        let node = (util.isString(src) ? new DOMParser().parseFromString(util.readFile(src)) : src);
+        let node = (util.isString(src) ? new DOMParser().parseFromString(content) : src);
         let template = [].slice.call(node.childNodes || []).filter((n) => n.nodeName === 'template');
         if (!template.length)
             throw 'Can not find template from ' + src;
@@ -41,7 +53,7 @@ export default {
     },
 
     parseExp (content, prefix, ignores) {
-        let comid = this.comPrefix[prefix];
+        let comid = this.getPrefix(prefix);
         // replace {{ param ? 'abc' : 'efg' }} => {{ $prefix_param ? 'abc' : 'efg' }}
         return content.replace(/\{\{([^}]+)\}\}/ig, (matchs, words) => {
             return matchs.replace(/[^\.\w'"]([a-z_\$][\w\d\._\$]*)/ig, (match, word, n) => {
@@ -51,7 +63,6 @@ export default {
                 if (ignores[w] || this.isInQuote(matchs, n)) {
                     return match;
                 } else {
-                    debugger;
                     return `${char}${PREFIX}${comid}${JOIN}${word}`;
                 }
             });
@@ -61,7 +72,7 @@ export default {
 
     updateBind (node, prefix, ignores = {}) {
 
-        let comid = this.comPrefix[prefix];
+        let comid = this.getPrefix(prefix);
 
         if (node.nodeName === '#text') {
             if (node.data && node.data.indexOf('{{') > -1) {
@@ -110,9 +121,10 @@ export default {
 
             let src = util.findComponent(definePath);
 
-            this.comPrefix[prefix ? `${prefix}$${comid}` : `$${comid}`] = this.comCount++;
+            //this.comPrefix[prefix ? `${prefix}$${comid}` : `$${comid}`] = this.comCount++;
+            //this.getPrefix(prefix ? `${prefix}$${comid}` : `$${comid}`);
 
-            node.replaceChild(this.compileXML(this.getTemplate(src), prefix ? `${prefix}$${comid}` : `$${comid}`), com);
+            node.replaceChild(this.compileXML(this.getTemplate(src), prefix ? `${prefix}$${comid}` : `${comid}`), com);
         };
         return node;
     },
@@ -123,7 +135,7 @@ export default {
         let node = new DOMParser().parseFromString(content);
         node = this.compileXML(node);
         let target = util.getDistPath(opath, 'wxml', src, dist);
-        util.log('WXML: ' + target, '写入');
+        util.log('WXML: ' + path.relative(process.cwd(), target), '写入');
         util.writeFile(target, node.toString());
     }
 }
