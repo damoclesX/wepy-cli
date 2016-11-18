@@ -30,6 +30,10 @@ export default {
     build (config) {
           
         let wepyrc = util.getConfig();
+        if (!wepyrc) {
+            util.error('没有检测到.wepyrc文件, 请执行`wepy new demo`创建');
+            return;
+        }
         let src = config.source || wepyrc.src || 'src';
         let dist = config.output || wepyrc.output || 'dist';
 
@@ -38,9 +42,6 @@ export default {
         let current = process.cwd();
         let files = file ? [file] : util.getFiles('src');
 
-        if (!config) {
-            throw '无效配置文件.wepyrc';
-        }
 
         cache.setSrc(src);
         cache.setDist(dist);
