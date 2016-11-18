@@ -49,7 +49,7 @@ export default {
         _buildCache = cache;
     },
     saveBuildCache() {
-        util.writeFile(cachePath, _buildCache);
+        util.writeFile(cachePath, JSON.stringify(_buildCache));
     },
     checkBuildCache(file) {
         let cache = this.getBuildCache();

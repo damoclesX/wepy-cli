@@ -1,6 +1,7 @@
 import commander from 'commander';
 import path from 'path';
 import {exec} from 'child_process';
+import updateNotifier from 'update-notifier';
 import util from './util';
 import compile from './compile';
 
@@ -84,6 +85,16 @@ let generateProject = (name) => {
         console.log(d.substring(d, d.length - 1));
     });
 };
+
+
+let checkUpdates = () => {
+    let pkg = require(path.join(util.cliDir, '..' + path.sep + 'package.json'));
+    let notifier = updateNotifier({pkg, callback: (err, update) => {
+    }});
+    notifier.notify();
+    console.log(pkg.version);
+};
+//checkUpdates();
 
 
 commander.usage('[command] <options ...>');

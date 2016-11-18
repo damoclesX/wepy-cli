@@ -65,6 +65,9 @@ export default {
             }
         });
 
+        // 缓存文件修改时间戳
+        cache.saveBuildCache();
+
         if (config.watch) {
             this.watch(config);
         }
