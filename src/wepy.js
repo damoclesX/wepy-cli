@@ -106,12 +106,12 @@ commander.option('-m, --mode <mode>', 'project mode type(normal, module), defaul
   think.mode = think['mode_' + mode];
 });*/
 
-commander.command('build').description('create project').action(projectPath => {
+commander.command('build').description('编译项目').action(projectPath => {
     compile.build(commander);
 });
 
 commander.command('new <projectName>').description('生成项目').action(name => {
-    generateProject(name);
+    generateProject(name || 'temp');
 });
 
 
