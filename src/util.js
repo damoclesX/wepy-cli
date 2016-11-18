@@ -8,7 +8,7 @@ import cache from './cache';
 colors.enabled = true;
 
 colors.setTheme({
-    SILLY: 'rainbow',
+    /*SILLY: 'rainbow',
     INPUT: 'grey',
     VERBOSE: 'cyan',
     PROMPT: 'grey',
@@ -17,7 +17,10 @@ colors.setTheme({
     HELP: 'cyan',
     WARN: 'yellow',
     DEBUG: 'blue',
-    ERROR: 'red',
+    ERROR: 'red',*/
+    '执行': 'blue',
+    '信息': 'grey',
+    '完成': 'green',
     '监听': 'magenta',
     '错误': 'red',
     '拷贝': 'yellow',
@@ -42,6 +45,7 @@ export default {
     },
 
     currentDir: process.cwd(),
+    cliDir: __dirname,
 
     isFunction (fn) {
         return typeof(fn) === 'function';
@@ -163,7 +167,7 @@ export default {
             type = type.toUpperCase();
             if(type === 'ERROR'){
                 console.error(colors.red('[Error] ' + msg));
-                console.log();
+                //console.log();
             } else {
                 let fn = colors[type] ? colors[type] : colors['info'];
                 console.log(dateTime + colors[type](`[${type}] `) + msg);

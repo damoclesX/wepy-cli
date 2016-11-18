@@ -59,7 +59,8 @@ export default {
                 try {
                     cWpp.compile(opath);
                 } catch (e) {
-                    util.log(e, '错误')
+                    util.log(e, '错误');
+                    console.log(e);
                 }
             }
         });

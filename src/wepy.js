@@ -1,7 +1,11 @@
 import commander from 'commander';
 import path from 'path';
+import {exec} from 'child_process';
 import util from './util';
 import compile from './compile';
+
+
+const templateDir = path.join(util.cliDir, '../template', path.sep);
 
 
 
@@ -18,15 +22,77 @@ let displayVersion = () => {
     console.log(chars);
 };
 
+let generateProject = (name) => {
+
+    let packagePath = path.join(util.currentDir, 'package.json');
+
+    if (util.isFile(packagePath) || util.isDir(path.join(util.currentDir, 'src'))) {
+        util.log('目录不为空, 请请勿重复初始化', '错误');
+        return;
+    }
+
+    let pkg = path.join(templateDir, 'package.json');
+    pkg = util.readFile(pkg);
+    pkg = JSON.parse(pkg);
+    pkg.name = name;
+
+    let dependencies = [
+        'wepy',
+        'babel-plugin-syntax-export-extensions',
+        'babel-plugin-transform-export-extensions',
+        'babel-plugin-transform-runtime',
+        'babel-preset-es2015',
+        'babel-preset-stage-1',
+        'babel-runtime'
+    ];
+
+
+    util.writeFile(packagePath, JSON.stringify(pkg));
+    util.log('配置: ' + 'package.json', '写入');
+
+    let files = util.getFiles(templateDir);
+
+    files.forEach((file) => {
+        let target = path.join(util.currentDir, file);
+        let opath = path.parse(target);
+
+        util.writeFile(target, util.readFile(path.join(templateDir, file)));
+        util.log('文件: ' + file, '拷贝');
+    });
+
+    let cmd = 'npm install --save ' + dependencies.join(' ');
+    util.log('执行命令: ' + cmd, '执行');
+    util.log('可能需要几分钟, 请耐心等待...', '信息');
+    let fcmd = exec('npm install --save ' + dependencies.join(' '), () => {
+        util.log('安装依赖完成', '完成');
+        
+        let cmd = 'wepy build';
+        util.log('执行命令: ' + cmd, '执行');
+        util.log('可能需要几分钟, 请耐心等待...', '信息');
+
+        let fcmd2 = exec(cmd, () => {
+            util.log('代码编译完成', '完成');
+            util.log('项目初始化完成, 可以开始使用小程序', '完成');
+        });
+
+        fcmd2.stdout.on('data', (d) => {
+            console.log(d.substring(d, d.length - 1));
+        });
+
+    });
+    fcmd.stdout.on('data', (d) => {
+        console.log(d.substring(d, d.length - 1));
+    });
+};
+
 
 commander.usage('[command] <options ...>');
-commander.option('-v, --version', 'output the version number', () => {
+commander.option('-v, --version', '显示版本号', () => {
   displayVersion();
 });
-commander.option('-V', 'output the version number', () => {
+commander.option('-V', '显示版本号', () => {
   displayVersion();
 });
-commander.option('--es5', 'use es5 for project, used in `new` command');
 commander.option('-s, --source <source>', '源码目录');
 commander.option('-t, --target <target>', '生成代码目录');
 commander.option('-f, --file <file>', '待编译wpp文件');
@@ -44,7 +110,8 @@ commander.command('build').description('create project').action(projectPath => {
     compile.build(commander);
 });
 
-commander.command('new <projectName>').description('生成项目').action(module => {
+commander.command('new <projectName>').description('生成项目').action(name => {
+    generateProject(name);
 });
 
 

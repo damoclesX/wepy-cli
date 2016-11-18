@@ -1,0 +1,164 @@
+<style type="less">
+    .userinfo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .userinfo-avatar {
+        width: 80rpx;
+        height: 80rpx;
+        border-radius: 50%;
+    }
+
+    .userinfo-nickname {
+        color: #aaa;
+    }
+    .testarea {
+        width: 100%;
+        margin-top: 20rpx;
+        text-align: left;
+        font-size: 12px;
+        padding-top: 20rpx;
+        padding-left: 50rpx;
+        padding-bottom: 20rpx;
+        border: 1px solid #ccc;
+
+        .testtitle {
+            padding-bottom: 20rpx;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .testinfo {
+            padding: 15rpx;
+        }
+        .testcounter {
+            margin-top: 15rpx;
+            position: absolute;
+        }
+        .counterview {
+            margin-left: 120rpx;
+        }
+    }
+</style>
+<template>
+    <view class="container">
+        <view class="userinfo" bindtap="handleViewTap">
+            <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+            <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
+        </view>
+
+        <view class="testarea">
+            <view class="testtitle">测试数据绑定</view>
+            <text class="testinfo">{{normalTitle}}</text>
+            <text class="testinfo">{{setTimeoutTitle}}</text>
+        </view>
+        <view class="testarea">
+            <view class="testtitle">测试组件通信</view>
+                <button bindtap="counter1plus" size="mini"> 点我修改组件 </button>
+            </view>
+        <view class="testarea">
+            <view class="testtitle">测试组件: </view>
+            <text class="testcounter">计数组件1: </text>
+            <view class="counterview">
+                <component id="counter1" path="counter"/>
+            </view>
+
+            <text class="testcounter">计数组件2: </text>
+
+            <view class="counterview">
+                <component id="counter2" path="counter"/>
+            </view>
+
+        </view>
+
+        <view class="testarea">
+            <view class="testtitle">测试组件嵌套: </view>
+            <component id="panel" />
+        </view>
+
+
+
+        <view class="testarea">
+            <view class="testtitle">测试列表: </view>
+            <component id="list" />
+        </view>
+
+
+
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    import List from '../components/list';
+    import Panel from '../components/panel';
+    import Counter from '../components/counter';
+
+    export default class Index extends wepy.page {
+
+        config = {
+            "navigationBarTitleText": "test"
+        };
+        components = {
+            panel: Panel,
+            counter1: Counter,
+            counter2: Counter,
+            list: List
+        };
+
+        data = {
+            userInfo: {
+                nickName: '加载中...'
+            },
+            normalTitle: '原始标题',
+            setTimeoutTitle: '标题三秒后会被修改',
+            count: 0
+        };
+        methods = {
+            counter1plus () {
+
+                //this.$invoke('counter1', 'plus', 1,2,3);
+
+                this.$invoke('/panel/counter1', 'plus', 45, 6);
+                this.$invoke('counter2', 'minus', 45, 6);
+                this.$invoke('counter1', 'plus', 45, 6);
+
+                this.$broadcast('index-broadcast', 1, 3, 4);
+            }
+        };
+
+        events = {
+            'index-emit': ($event, ...args) => {
+                console.log(`${this.name} receive ${$event.name} from ${$event.source.name}`);
+            }
+        };
+        async onLoad() {
+            try {
+                console.log(222);
+                // 调用应用实例的方法获取全局数据
+                let userInfo;
+                try {
+                    userInfo = await this.$parent.getUserInfo();
+                } catch (e) {
+                    userInfo = {
+                        nickName: 'Network error'
+                    }
+                }
+                if (userInfo)
+                    this.userInfo = userInfo;
+                this.normalTitle = '标题已被修改';
+
+                this.setTimeoutTitle = '标题三秒后会被修改';
+                setTimeout(() => {
+                    this.setTimeoutTitle = '到三秒了';
+                    this.$apply();
+                }, 3000);
+
+                this.$apply();
+            } catch (error) {
+                console.error(error.stack);
+            }
+        }
+    }
+</script>
