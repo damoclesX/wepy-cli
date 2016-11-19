@@ -33,12 +33,12 @@ export default {
     findComponent(com) {
         let comPath = path.join(this.currentDir, cache.getSrc(), 'components', com);
         let src = '';
-        if (this.isFile(comPath + '.wpp')) {
-            src = comPath + '.wpp';
-        } else if (this.isFile(comPath + '/index.wpp')) {
-            src = comPath + '/index.wpp';
-        } else if (this.isFile(comPath + '/' + com + '.wpp')) {
-            src = comPath + '/' + com + '.wpp';
+        if (this.isFile(comPath + '.wpy')) {
+            src = comPath + '.wpy';
+        } else if (this.isFile(comPath + '/index.wpy')) {
+            src = comPath + '/index.wpy';
+        } else if (this.isFile(comPath + '/' + com + '.wpy')) {
+            src = comPath + '/' + com + '.wpy';
         } else 
             throw new Error('Can not find components ' + comPath);
         return src;

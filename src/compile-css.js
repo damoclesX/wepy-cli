@@ -12,7 +12,7 @@ export default {
             requires.forEach((r) => {
                 let comsrc = util.findComponent(r);
                 let relative = path.relative(opath.dir + path.sep + opath.base, comsrc);
-                relative = relative.replace('.wpp', '.wxss').replace(/\\/ig, '/').replace('../', './');
+                relative = relative.replace('.wpy', '.wxss').replace(/\\/ig, '/').replace('../', './');
                 content = '@import "' + relative + '";\n' + content;
             });
         }

@@ -46,7 +46,7 @@ export default {
         return requires;
     },
 
-    resolveWpp (xml, opath) {
+    resolveWpy (xml, opath) {
 
         let rst = {style: {code: ''}, template: {code: ''}, script: {code: ''}};
 
@@ -112,7 +112,7 @@ export default {
 
         let relative = path.relative(util.currentDir, filepath);
 
-        if (filepath === path.join(util.currentDir, src, 'app.wpp')) {
+        if (filepath === path.join(util.currentDir, src, 'app.wpy')) {
             type = 'app';
             util.log('入口: ' + relative, '编译');
         } else if (pages.indexOf(relative) > -1) {
@@ -125,32 +125,32 @@ export default {
             util.log('Other: ' + relative, '编译');
         }
 
-        let wpp = this.resolveWpp(doc, opath);
+        let wpy = this.resolveWpy(doc, opath);
 
         if (type === 'app') { // 第一个编译
-            cache.setPages(wpp.config.pages.map(v => path.join(src, v + '.wpp')));
+            cache.setPages(wpy.config.pages.map(v => path.join(src, v + '.wpy')));
         }
 
-        if (wpp.config) {
-            cConfig.compile(wpp.config, opath);
+        if (wpy.config) {
+            cConfig.compile(wpy.config, opath);
         }
 
-        if (wpp.style.code && wpp.style.type === 'less') {
-            if (wpp.style.type === 'less')
-                cLess.compile(wpp.style.code, wpp.template.requires, opath);
-            else (wpp.style.type === 'css')
-                cCss.compile(wpp.style.code, wpp.template.requires, opath);
+        if (wpy.style.code && wpy.style.type === 'less') {
+            if (wpy.style.type === 'less')
+                cLess.compile(wpy.style.code, wpy.template.requires, opath);
+            else (wpy.style.type === 'css')
+                cCss.compile(wpy.style.code, wpy.template.requires, opath);
         } else {
-            cCss.compile('', wpp.template.requires, opath);
+            cCss.compile('', wpy.template.requires, opath);
         }
 
-        if (wpp.template.code && (type !== 'app' && type !== 'component')) { // App 和 Component 不编译 wxml
-            if (wpp.template.type === 'wxml')
-                cWxml.compile(wpp.template.code, opath);
+        if (wpy.template.code && (type !== 'app' && type !== 'component')) { // App 和 Component 不编译 wxml
+            if (wpy.template.type === 'wxml')
+                cWxml.compile(wpy.template.code, opath);
         }
 
-        if (wpp.script.code) {
-            cJS.compile(wpp.script.code, type, opath);
+        if (wpy.script.code) {
+            cJS.compile(wpy.script.code, type, opath);
         }
     }
 }

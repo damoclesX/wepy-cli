@@ -3,7 +3,7 @@ import chokidar from 'chokidar';
 
 import cache from './cache';
 import util from './util';
-import cWpp from './compile-wpp';
+import cWpy from './compile-wpy';
 import cWxml from './compile-wxml';
 import cJS from './compile-js';
 
@@ -46,19 +46,19 @@ export default {
         cache.setSrc(src);
         cache.setDist(dist);
 
-        if (files.length > 1 && files[0] !== 'app.wpp') { // 如果第一个不是 app.wpp
-            if (util.isFile(path.join(current, src, 'app.wpp'))) { // src/app.wpp 存在, 则把它放在第一位, 因为后面需要取页面路径
-                let newFiles = ['app.wpp'].concat(files.filter(v => v !== 'app.wpp'));
+        if (files.length > 1 && files[0] !== 'app.wpy') { // 如果第一个不是 app.wpy
+            if (util.isFile(path.join(current, src, 'app.wpy'))) { // src/app.wpy 存在, 则把它放在第一位, 因为后面需要取页面路径
+                let newFiles = ['app.wpy'].concat(files.filter(v => v !== 'app.wpy'));
                 files = newFiles;
             } else {
-                util.error('根目录不存在app.wpp');
+                util.error('根目录不存在app.wpy');
             }
         }
         files.forEach((file) => {
             let opath = path.parse(path.join(current, src, file));
-            if (opath.ext === '.wpp') {
+            if (opath.ext === '.wpy') {
                 try {
-                    cWpp.compile(opath);
+                    cWpy.compile(opath);
                 } catch (e) {
                     util.log(e, '错误');
                     console.log(e);

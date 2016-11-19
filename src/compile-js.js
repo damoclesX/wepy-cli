@@ -63,7 +63,7 @@ export default {
                 needCopy = true;
             }
 
-            if (util.isFile(source + '.wpp')) {
+            if (util.isFile(source + '.wpy')) {
                 ext = '.js';
             } else if (util.isFile(source + '.js')) {
                 ext = '.js';
