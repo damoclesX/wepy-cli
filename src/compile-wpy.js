@@ -1,12 +1,12 @@
-//const DOMParser = require('xmldom').DOMParser;
 import path from 'path';
+import fs from 'fs';
 import {DOMParser} from 'xmldom';
 import cache from './cache';
 import util from './util';
 
 import cConfig from './compile-config';
 import cLess from './compile-less';
-import cCss from './compile-less';
+import cCss from './compile-css';
 import cWxml from './compile-wxml';
 import cJS from './compile-js';
 
@@ -80,7 +80,7 @@ export default {
         }
 
         // default type
-        rst.style.type = rst.style.type || 'type';
+        rst.style.type = rst.style.type || 'css';
         rst.template.type = rst.template.type || 'wxml';
         rst.script.type = rst.script.type || 'js';
 
@@ -92,6 +92,17 @@ export default {
             rst.config = JSON.parse(rst.config);
 
         return rst;
+    },
+
+    remove (opath, ext) {
+        let src = cache.getSrc();
+        let dist = cache.getDist();
+        ext = ext || opath.substr(1);
+        let target = util.getDistPath(opath, ext, src, dist);
+        if (util.isFile(target)) {
+            util.log('配置: ' + path.relative(util.currentDir, target), '删除');
+            fs.unlinkSync(target);
+        }
     },
 
     compile (opath) {
@@ -133,15 +144,17 @@ export default {
 
         if (wpy.config) {
             cConfig.compile(wpy.config, opath);
+        } else {
+            this.remove(opath, 'json');
         }
 
-        if (wpy.style.code && wpy.style.type === 'less') {
-            if (wpy.style.type === 'less')
+        if (wpy.style.code || wpy.template.requires.length) {
+            if (wpy.style.type === 'less') 
                 cLess.compile(wpy.style.code, wpy.template.requires, opath);
-            else if (wpy.style.type === 'css')
+            if (wpy.style.type === 'css')
                 cCss.compile(wpy.style.code, wpy.template.requires, opath);
         } else {
-            cCss.compile('', wpy.template.requires, opath);
+            this.remove(opath, 'wxss');
         }
 
         if (wpy.template.code && (type !== 'app' && type !== 'component')) { // App 和 Component 不编译 wxml

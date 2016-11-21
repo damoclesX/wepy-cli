@@ -19,6 +19,7 @@ colors.setTheme({
     DEBUG: 'blue',
     ERROR: 'red',*/
     '变更': 'bgYellow',
+    '删除': 'bgMagenta',
     '执行': 'blue',
     '信息': 'grey',
     '完成': 'green',

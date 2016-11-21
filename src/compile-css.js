@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 
 import util from './util';
 import cache from './cache';
@@ -23,7 +24,7 @@ export default {
             });
         }
         let target = util.getDistPath(opath, 'wxss', src, dist);
-        util.log('CSS: ' + target, '写入');
+        util.log('CSS : ' + path.relative(util.currentDir, target), '写入');
         util.writeFile(target, content);
     }
 }
