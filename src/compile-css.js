@@ -19,7 +19,7 @@ export default {
             requires.forEach((r) => {
                 let comsrc = util.findComponent(r);
                 let relative = path.relative(opath.dir + path.sep + opath.base, comsrc);
-                let code = util.getFile(opath);
+                let code = util.readFile(opath);
                 if (/<style/.test(code)) {
                     relative = relative.replace('.wpy', '.wxss').replace(/\\/ig, '/').replace('../', './');
                     content = '@import "' + relative + '";\n' + content;
