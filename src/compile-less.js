@@ -20,8 +20,12 @@ export default {
                 requires.forEach((r) => {
                     let comsrc = util.findComponent(r);
                     let relative = path.relative(opath.dir + path.sep + opath.base, comsrc);
-                    relative = relative.replace('.wpy', '.wxss').replace(/\\/ig, '/').replace('../', './');
-                    res.css = '@import "' + relative + '";\n' + res.css;
+                    let code = util.getFile(opath);
+                    if (/<style/.test(code)) {
+                        console.log(relative);
+                        relative = relative.replace('.wpy', '.wxss').replace(/\\/ig, '/').replace('../', './');
+                        res.css = '@import "' + relative + '";\n' + res.css;
+                    }
                 });
             }
             let target = util.getDistPath(opath, 'wxss', src, dist);
