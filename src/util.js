@@ -80,6 +80,17 @@ export default {
         }
         return fs.statSync(p).isDirectory();
     },
+    /**
+     * xml dom 对 TEXT_NODE 和 ATTRIBUTE_NODE 进行转义。
+     */
+    decode (contend) {
+        let pmap = ['<', '&', '"'];
+        let amap = ['&lt;', '&amp;', '&quot;'];
+        let reg = new RegExp(`(${amap[0]}|${amap[1]}|${amap[2]})`, 'ig');
+        return contend.replace(reg, (match, m) => {
+            return pmap[amap.indexOf(m)];
+        });
+    },
     unique (arr) {
         let tmp = {}, out = [];
         arr.forEach((v) => {

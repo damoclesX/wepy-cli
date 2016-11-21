@@ -128,17 +128,6 @@ export default {
         };
         return node;
     },
-    /**
-     * xml dom 对 TEXT_NODE 和 ATTRIBUTE_NODE 进行转义。
-     */
-    decode (contend) {
-        let pmap = ['<', '&', '"'];
-        let amap = ['&lt;', '&amp;', '&quot;'];
-        let reg = new RegExp(`(${amap[0]}|${amap[1]}|${amap[2]})`, 'ig');
-        return contend.replace(reg, (match, m) => {
-            return pmap[amap.indexOf(m)];
-        });
-    },
 
     compile (content, opath) {
         let src = cache.getSrc();
@@ -147,6 +136,6 @@ export default {
         node = this.compileXML(node);
         let target = util.getDistPath(opath, 'wxml', src, dist);
         util.log('WXML: ' + path.relative(process.cwd(), target), '写入');
-        util.writeFile(target, this.decode(node.toString()));
+        util.writeFile(target, util.decode(node.toString()));
     }
 }

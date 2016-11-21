@@ -66,7 +66,7 @@ export default {
                     }
                 } else {
                     [].slice.call(child.childNodes || []).forEach((c) => {
-                        rst[child.nodeName].code += c.toString();
+                        rst[child.nodeName].code += util.decode(c.toString());
                     });
                 }
 
