@@ -9,6 +9,12 @@ export default {
         let src = cache.getSrc();
         let dist = cache.getDist();
 
+        if (arguments.length === 1) {
+            requires = [];
+            opath = content;
+            content = util.readFile(path.join(opath.dir, opath.base));
+        }
+
         less.render(content || '/* empty */', {}).then((res) => {
             if (requires && requires.length) {
                 requires.forEach((r) => {

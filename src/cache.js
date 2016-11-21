@@ -2,6 +2,7 @@ import util from './util';
 
 const cachePath = '.wepycache';
 let _buildCache = null;
+let _filelistCache = {};
 
 export default {
     getSrc () {
@@ -27,6 +28,12 @@ export default {
     },
     setConfig (v = null) {
         this._config = v;
+    },
+    setFileList (key, v) {
+        _filelistCache[key] = v;
+    },
+    getFileList (key) {
+        return _filelistCache[key] || null;
     },
     getBuildCache (file) {
         if (_buildCache)

@@ -18,6 +18,7 @@ colors.setTheme({
     WARN: 'yellow',
     DEBUG: 'blue',
     ERROR: 'red',*/
+    '变更': 'bgYellow',
     '执行': 'blue',
     '信息': 'grey',
     '完成': 'green',
@@ -66,6 +67,7 @@ export default {
         return Array.isArray(obj);
     },
     isFile (p) {
+        p = (typeof(p) === 'object') ? path.join(p.dir, p.base) : p;
         if (!fs.existsSync(p)) {
             return false;
         }
@@ -77,8 +79,19 @@ export default {
         }
         return fs.statSync(p).isDirectory();
     },
+    unique (arr) {
+        let tmp = {}, out = [];
+        arr.forEach((v) => {
+            if (!tmp[v]) {
+                tmp[v] = 1;
+                out.push(v);
+            }
+        });
+        return out;
+    },
     readFile (p) {
         let rst = '';
+        p = (typeof(p) === 'object') ? path.join(p.dir, p.base) : p;
         try {
             rst = fs.readFileSync(p, 'utf-8');
         } catch (e) {
@@ -87,15 +100,25 @@ export default {
         return rst;
     },
     writeFile (p, data) {
-        let opath = path.parse(p);
+        let opath = (this.isString(p) ? path.parse(p) : p);
         if (!this.isDir(opath.dir)) {
             mkdirp.sync(opath.dir);
         }
         fs.writeFileSync(p, data);
     },
+    copy(opath, ext, src, dist) {
+        let target = this.getDistPath(opath, ext, src, dist);
+        this.writeFile(target, this.readFile(path.join(path.dir, path.base)));
+    },
+    getRelative(opath) {
+        return path.relative(this.currentDir, path.join(opath.dir, opath.base));
+    },
     getDistPath(opath, ext, src, dist) {
+        src = src || cache.getSrc();
+        dist = dist || cache.getDist();
+        ext = (ext ? ('.' + ext) : opath.ext);
         let dir = (opath.dir + path.sep).replace(path.sep + src + path.sep, path.sep + dist + path.sep);
-        return dir + opath.name + '.' + ext;
+        return dir + opath.name + ext;
     },
     getModifiedTime (p) {
         return this.isFile(p) ? +fs.statSync(p).mtime : false;
@@ -114,6 +137,9 @@ export default {
         return config;
     },
     getFiles (dir = process.cwd(), prefix = '') {
+        let cfiles = cache.getFileList(dir);
+        if (cfiles)
+            return cfiles;
         dir = path.normalize(dir);
         if (!fs.existsSync(dir)) {
             return [];
@@ -129,6 +155,8 @@ export default {
                 rst = rst.concat(this.getFiles(path.normalize(dir + path.sep + item),  path.normalize(prefix + item + path.sep)));
             }
         });
+
+        cache.setFileList(dir, rst);
         return rst;
     },
     getVersion () {
@@ -170,7 +198,7 @@ export default {
                 //console.log();
             } else {
                 let fn = colors[type] ? colors[type] : colors['info'];
-                console.log(dateTime + colors[type](`[${type}] `) + msg);
+                console.log(dateTime + colors[type](`[${type}]`) + ' ' + msg);
             }
         } else {
             console.log(dateTime + msg); 

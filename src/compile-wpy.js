@@ -138,7 +138,7 @@ export default {
         if (wpy.style.code && wpy.style.type === 'less') {
             if (wpy.style.type === 'less')
                 cLess.compile(wpy.style.code, wpy.template.requires, opath);
-            else (wpy.style.type === 'css')
+            else if (wpy.style.type === 'css')
                 cCss.compile(wpy.style.code, wpy.template.requires, opath);
         } else {
             cCss.compile('', wpy.template.requires, opath);

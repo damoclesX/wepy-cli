@@ -7,6 +7,12 @@ export default {
     compile (content, requires, opath) {
         let src = cache.getSrc();
         let dist = cache.getDist();
+        
+        if (arguments.length === 1) {
+            requires = [];
+            opath = content;
+            content = util.readFile(path.join(opath.dir, opath.base));
+        }
 
         if (requires && requires.length) {
             requires.forEach((r) => {
