@@ -9,6 +9,7 @@ import cLess from './compile-less';
 import cJS from './compile-js';
 
 
+let watchReady = false;
 let preventDup = {};
 
 
@@ -78,15 +79,18 @@ export default {
         chokidar.watch(`.${path.sep}${src}`, {
             depth: 99
         }).on('all', (evt, filepath) => {
-            if (evt === 'change' && preventDup[filepath] !== 'change') {
-                preventDup[filepath] = 'change';
+            if ((evt === 'change' || evt === 'add') && watchReady && !preventDup[filepath]) {
+                preventDup[filepath] = evt;
                 config.file = path.join('..', filepath);
                 util.log('文件: ' + filepath, '变更');
                 this.build(config);
                 setTimeout(() => {
-                    preventDup[filepath] = '';
+                    preventDup[filepath] = false;
                 }, 500);
             }
+        }).on('ready', () => {
+            watchReady = true;   
+            util.log('开始监听文件改动。', '信息');
         });
     },
     build (config) {

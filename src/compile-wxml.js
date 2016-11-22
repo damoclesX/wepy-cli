@@ -21,6 +21,7 @@ export default {
         if (content === null) {
             throw '打开文件失败: ' + content;
         }
+        content = content.substring(content.indexOf('<template>'), content.indexOf('</template>') + 11);
         let doc = new DOMImplementation().createDocument();
         let node = (util.isString(src) ? new DOMParser().parseFromString(content) : src);
         let template = [].slice.call(node.childNodes || []).filter((n) => n.nodeName === 'template');

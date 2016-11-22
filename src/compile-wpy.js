@@ -115,6 +115,7 @@ export default {
             throw new Error('打开文件失败: ' + filepath);
             return;
         }
+        content = util.encode(content, content.indexOf('<script>') + 9, content.indexOf('</script>') - 1);
         let doc = new DOMParser().parseFromString(content);
 
         let type = '';

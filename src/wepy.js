@@ -44,7 +44,8 @@ let generateProject = (name) => {
         'babel-plugin-transform-runtime',
         'babel-preset-es2015',
         'babel-preset-stage-1',
-        'babel-runtime'
+        'babel-runtime',
+        'babel-polyfill'
     ];
 
 

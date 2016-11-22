@@ -83,13 +83,32 @@ export default {
     /**
      * xml dom 对 TEXT_NODE 和 ATTRIBUTE_NODE 进行转义。
      */
-    decode (contend) {
+    decode (content) {
         let pmap = ['<', '&', '"'];
         let amap = ['&lt;', '&amp;', '&quot;'];
         let reg = new RegExp(`(${amap[0]}|${amap[1]}|${amap[2]})`, 'ig');
-        return contend.replace(reg, (match, m) => {
+        return content.replace(reg, (match, m) => {
             return pmap[amap.indexOf(m)];
         });
+    },
+    encode (content, start, end) {
+        start = start || 0;
+        end = end || content.length;
+
+        let buffer = [];
+        let pmap = ['<', '&', '"'];
+        let amap = ['&lt;', '&amp;', '&quot;'];
+
+        let i = 0, c;
+        for (let i = 0, len = content.length; i < len; i++) {
+            if (i < start || i > end) {
+                buffer.push(content[i]);
+            } else {
+                c = pmap.indexOf(content[i]);
+                buffer.push(c === -1 ? content[i] : amap[c]);
+            }
+        }
+        return buffer.join('');
     },
     unique (arr) {
         let tmp = {}, out = [];
@@ -120,7 +139,10 @@ export default {
     },
     copy(opath, ext, src, dist) {
         let target = this.getDistPath(opath, ext, src, dist);
-        this.writeFile(target, this.readFile(path.join(path.dir, path.base)));
+        this.writeFile(target, this.readFile(path.join(opath.dir, opath.base)));
+        let readable = fs.createReadStream(path.join(opath.dir, opath.base));
+        let writable = fs.createWriteStream(target);   
+        readable.pipe(writable);
     },
     getRelative(opath) {
         return path.relative(this.currentDir, path.join(opath.dir, opath.base));

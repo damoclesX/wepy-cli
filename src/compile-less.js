@@ -22,7 +22,6 @@ export default {
                     let relative = path.relative(opath.dir + path.sep + opath.base, comsrc);
                     let code = util.readFile(opath);
                     if (/<style/.test(code)) {
-                        console.log(relative);
                         relative = relative.replace('.wpy', '.wxss').replace(/\\/ig, '/').replace('../', './');
                         res.css = '@import "' + relative + '";\n' + res.css;
                     }

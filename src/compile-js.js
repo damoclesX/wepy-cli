@@ -115,6 +115,21 @@ export default {
         });
     },
 
+    npmHack (filename, code) {
+        switch(filename) {
+            case '_global.js':
+                code = code.replace("Function('return this')()", 'this');
+                break;
+            case '_html.js':
+                code = 'module.exports = false;';
+                break;
+            case '_microtask.js':
+                code = code.replace('if(Observer)', 'if(false && Observer)');
+                break;
+        }
+        return code;
+    },
+
     compile (code, type, opath) {
         let config = util.getConfig();
         if (!code) {
@@ -148,6 +163,7 @@ export default {
             util.log('JS  : ' + path.relative(process.cwd(), target), '写入');
             util.writeFile(target, code);
         } else {
+            code = this.npmHack(opath.base, code);
             let target = path.join(npmPath, path.relative(modulesPath, path.join(opath.dir, opath.base)));
             util.log('JS  : ' + path.relative(process.cwd(), target), '写入');
             util.writeFile(target, code);

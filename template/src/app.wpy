@@ -13,6 +13,7 @@
 <script>
 
 import wepy from 'wepy';
+import "babel-polyfill";
 
 export default class extends wepy.app {
 
