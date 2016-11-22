@@ -5,7 +5,7 @@
 .mylist:even {
     color: green;
 }
-<style>
+</style>
 <template>
     <view class="list">
     <view>
