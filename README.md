@@ -7,3 +7,6 @@
 ```bash
 npm install wepy-cli -g
 ```
+
+### Changelog
+[查看CHANGELOG](https://github.com/wepyjs/wepy/blob/master/CHANGELOG.md)
