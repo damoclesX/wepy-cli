@@ -1,4 +1,11 @@
 {
+  "wpyExt": "wpy",
+  "sass": {
+    "outputStyle": "compressed"
+  },
+  "less": {
+    "compress": true
+  },
   "babel": {
     "presets": [
       "es2015",

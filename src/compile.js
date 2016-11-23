@@ -6,6 +6,7 @@ import util from './util';
 import cWpy from './compile-wpy';
 import cWxml from './compile-wxml';
 import cLess from './compile-less';
+import cSass from './compile-sass';
 import cJS from './compile-js';
 
 
@@ -18,21 +19,25 @@ export default {
         //import Counter from '../components/counter';
         let src = cache.getSrc();
         let files = util.getFiles(src);
+        let ext = cache.getExt();
 
         let parents = [];
 
-        files = files.filter((v) => /\.(wpy|js)$/.test(v));
+        let reg = new RegExp('\\.(' + ext.substr(1) + '|js)$');
+
+        files = files.filter((v) => reg.test(v));
 
         files.forEach((f) => {
             let opath = path.parse(path.join(util.currentDir, src, f));
             let content = util.readFile(opath);
 
             content.replace(/import\s*([{\w\d-_}]*)\s*from\s*['"](.*)['"]/ig, (match, name, importpath) => {
-                if (!/\.wpy$/.test(importpath))
-                    importpath = importpath + '.wpy';
+                reg = new RegExp('\\.' + ext + '$');
+                if (!reg.test(importpath))
+                    importpath = importpath + ext;
                 
                 if (path.join(opath.dir, importpath) === path.join(util.currentDir, src, file)) {
-                    if (!/\.wpy$/.test(f)) {
+                    if (!reg.test(f)) {
                         parents = parents.concat(this.findReference(f));
                     } else {
                         // 组件的父组件无需更新，只有父页面需要更新
@@ -49,10 +54,13 @@ export default {
     findReference (file) {
         let src = cache.getSrc();
         let files = util.getFiles(src);
+        let ext = cache.getExt();
 
         let refs = [];
 
-        files = files.filter((v) => /\.wpy$/.test(v));
+        let reg = new RegExp('\\.' + ext + '$');
+
+        files = files.filter((v) => reg.test(v));
 
         files.forEach((f) => {
             let opath = path.parse(path.join(util.currentDir, src, f));
@@ -102,6 +110,10 @@ export default {
         }
         let src = config.source || wepyrc.src || 'src';
         let dist = config.output || wepyrc.output || 'dist';
+        let ext = config.wpyExt || wepyrc.wpyExt || '.wpy';
+
+        if (ext.indexOf('.') === -1)
+            ext = '.' + ext;
 
         let file = config.file;
 
@@ -111,9 +123,10 @@ export default {
 
         cache.setSrc(src);
         cache.setDist(dist);
+        cache.setExt(ext);
 
         if (file) { // 指定文件编译时
-            if (file.indexOf('.wpy') === -1) { // 是wpy文件，则直接编译，否则检查引用源
+            if (file.indexOf(ext) === -1) { // 是wpy文件，则直接编译，否则检查引用源
                 let refs = this.findReference(file);
                 if (refs.length === 0) { // 无引用源时，编译当前文件，否则编译引用源。
                     files = [file];
@@ -126,12 +139,12 @@ export default {
             }
         }
 
-        if (files.some((v) => v === 'app.wpy')) { // 如果编译文件包含app.wpy，且第一个不是 app.wpy
-            if (util.isFile(path.join(current, src, 'app.wpy'))) { // src/app.wpy 存在, 则把它放在第一位, 因为后面需要取页面路径
-                let newFiles = ['app.wpy'].concat(files.filter(v => v !== 'app.wpy'));
+        if (files.some((v) => v === 'app' + ext)) { // 如果编译文件包含app.wpy，且第一个不是 app.wpy
+            if (util.isFile(path.join(current, src, 'app' + ext))) { // src/app.wpy 存在, 则把它放在第一位, 因为后面需要取页面路径
+                let newFiles = ['app' + ext].concat(files.filter(v => v !== 'app' + ext));
                 files = newFiles;
             } else {
-                util.error('根目录不存在app.wpy');
+                util.error('根目录不存在app' + ext);
             }
         }
         files.forEach((f) => {
@@ -155,6 +168,7 @@ export default {
     compile(opath) {
         let src = cache.getSrc();
         let dist = cache.getDist();
+        let ext = cache.getExt();
 
         if (!util.isFile(opath)) {
             util.error('文件不存在：' + getRelative(opath));
@@ -163,11 +177,14 @@ export default {
         
         try {
             switch(opath.ext) {
-                case '.wpy':
+                case ext:
                     cWpy.compile(opath);
                     break;
                 case '.less':
                     cLess.compile(opath);
+                case '.sass':
+                case '.scss':
+                    cSass.compile(opath);
                     break;
                 case '.js':
                     cJS.compile(null, 'js', opath);

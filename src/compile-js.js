@@ -24,6 +24,8 @@ export default {
 
     resolveDeps (code, type, opath) {
 
+        let wpyExt = cache.getExt();
+
 
 
         return code.replace(/require\(['"]([\w\d_\-\.\/]+)['"]\)/ig, (match, lib) => {
@@ -63,7 +65,7 @@ export default {
                 needCopy = true;
             }
 
-            if (util.isFile(source + '.wpy')) {
+            if (util.isFile(source + wpyExt)) {
                 ext = '.js';
             } else if (util.isFile(source + '.js')) {
                 ext = '.js';

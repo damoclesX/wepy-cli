@@ -6,6 +6,7 @@ import util from './util';
 
 import cConfig from './compile-config';
 import cLess from './compile-less';
+import cSass from './compile-sass';
 import cCss from './compile-css';
 import cWxml from './compile-wxml';
 import cJS from './compile-js';
@@ -109,6 +110,7 @@ export default {
         let filepath = path.join(opath.dir, opath.base);
         let src = cache.getSrc();
         let dist = cache.getDist();
+        let wpyExt = cache.getExt();
         let pages = cache.getPages();
         let content = util.readFile(filepath);
         if (content === null) {
@@ -124,7 +126,7 @@ export default {
 
         let relative = path.relative(util.currentDir, filepath);
 
-        if (filepath === path.join(util.currentDir, src, 'app.wpy')) {
+        if (filepath === path.join(util.currentDir, src, 'app' + wpyExt)) {
             type = 'app';
             util.log('入口: ' + relative, '编译');
         } else if (pages.indexOf(relative) > -1) {
@@ -140,7 +142,7 @@ export default {
         let wpy = this.resolveWpy(doc, opath);
 
         if (type === 'app') { // 第一个编译
-            cache.setPages(wpy.config.pages.map(v => path.join(src, v + '.wpy')));
+            cache.setPages(wpy.config.pages.map(v => path.join(src, v + wpyExt)));
         }
 
         if (wpy.config) {
@@ -152,6 +154,8 @@ export default {
         if (wpy.style.code || wpy.template.requires.length) {
             if (wpy.style.type === 'less') 
                 cLess.compile(wpy.style.code, wpy.template.requires, opath);
+            if (wpy.style.type === 'sass') 
+                cSass.compile(wpy.style.code, wpy.template.requires, opath);
             if (wpy.style.type === 'css')
                 cCss.compile(wpy.style.code, wpy.template.requires, opath);
         } else {

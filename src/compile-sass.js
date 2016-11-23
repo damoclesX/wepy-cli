@@ -1,4 +1,4 @@
-import less from 'less';
+import sass from 'node-sass';
 import path from 'path';
 
 import util from './util';
@@ -10,7 +10,8 @@ export default {
         let dist = cache.getDist();
         let ext = cache.getExt();
         let config = cache.getConfig() || {};
-        let lessConfig = config.less || {};
+        let sassConfig = config.sass || {};
+
 
         if (arguments.length === 1) {
             requires = [];
@@ -18,12 +19,17 @@ export default {
             content = util.readFile(path.join(opath.dir, opath.base));
         }
 
-        less.render(content || '/* empty */', lessConfig).then((res) => {
+        sassConfig.data = content || '/* empty */';
+
+        sass.render(sassConfig, (err, res) => {
+            if (err)
+                throw err;
+
             if (requires && requires.length) {
                 requires.forEach((r) => {
                     let comsrc = util.findComponent(r);
                     let relative = path.relative(opath.dir + path.sep + opath.base, comsrc);
-                    let code = util.readFile(comsrc);
+                    let code = util.readFile(opath);
                     if (/<style/.test(code)) {
                         relative = relative.replace(ext, '.wxss').replace(/\\/ig, '/').replace('../', './');
                         res.css = '@import "' + relative + '";\n' + res.css;
@@ -31,11 +37,8 @@ export default {
                 });
             }
             let target = util.getDistPath(opath, 'wxss', src, dist);
-            util.log('LESS: ' + path.relative(util.currentDir, target), '写入');
+            util.log('SASS: ' + path.relative(util.currentDir, target), '写入');
             util.writeFile(target, res.css);
-        }).catch((e) => {
-            util.error(e);
         });
-
     }
 }

@@ -8,6 +8,7 @@ export default {
     compile (content, requires, opath) {
         let src = cache.getSrc();
         let dist = cache.getDist();
+        let ext = cache.getExt();
         
         if (arguments.length === 1) {
             requires = [];
@@ -21,7 +22,7 @@ export default {
                 let relative = path.relative(opath.dir + path.sep + opath.base, comsrc);
                 let code = util.readFile(comsrc);
                 if (/<style/.test(code)) {
-                    relative = relative.replace('.wpy', '.wxss').replace(/\\/ig, '/').replace('../', './');
+                    relative = relative.replace(ext, '.wxss').replace(/\\/ig, '/').replace('../', './');
                     content = '@import "' + relative + '";\n' + content;
                 }
             });

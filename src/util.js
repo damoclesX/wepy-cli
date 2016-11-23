@@ -33,14 +33,15 @@ colors.setTheme({
 export default {
 
     findComponent(com) {
+        let wpyExt = cache.getExt();
         let comPath = path.join(this.currentDir, cache.getSrc(), 'components', com);
         let src = '';
-        if (this.isFile(comPath + '.wpy')) {
-            src = comPath + '.wpy';
-        } else if (this.isFile(comPath + '/index.wpy')) {
-            src = comPath + '/index.wpy';
-        } else if (this.isFile(comPath + '/' + com + '.wpy')) {
-            src = comPath + '/' + com + '.wpy';
+        if (this.isFile(comPath + wpyExt)) {
+            src = comPath + wpyExt;
+        } else if (this.isFile(comPath + '/index' + wpyExt)) {
+            src = comPath + '/index' + wpyExt;
+        } else if (this.isFile(comPath + '/' + com + wpyExt)) {
+            src = comPath + '/' + com + wpyExt;
         } else 
             throw new Error('Can not find components ' + comPath);
         return src;

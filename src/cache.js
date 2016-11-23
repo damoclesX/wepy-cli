@@ -5,6 +5,12 @@ let _buildCache = null;
 let _filelistCache = {};
 
 export default {
+    setExt (v) {
+        this._ext = v;
+    },
+    getExt () {
+        return this._ext || '.wpy';
+    },
     getSrc () {
         return this._src || 'src';
     },
