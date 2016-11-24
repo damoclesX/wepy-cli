@@ -1,5 +1,5 @@
 {
-  "wpyExt": "wpy",
+  "wpyExt": ".wpy",
   "sass": {
     "outputStyle": "compressed"
   },
