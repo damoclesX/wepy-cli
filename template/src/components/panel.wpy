@@ -31,7 +31,7 @@
         events = {
             'index-broadcast': ($event, ...args) => {
                 console.log(`${this.name} receive ${$event.name} from ${$event.source.name}`);
-                $event.destroy();
+                $event.$destroy();
             }
         };
         methods = {
