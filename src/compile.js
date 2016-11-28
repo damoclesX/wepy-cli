@@ -15,6 +15,9 @@ let preventDup = {};
 
 
 export default {
+    /**
+     * find parent, import xxxx from xxx;
+     */
     findParents (file) {
         //import Counter from '../components/counter';
         let src = cache.getSrc();
@@ -31,8 +34,8 @@ export default {
             let opath = path.parse(path.join(util.currentDir, src, f));
             let content = util.readFile(opath);
 
-            content.replace(/import\s*([{\w\d-_}]*)\s*from\s*['"](.*)['"]/ig, (match, name, importpath) => {
-                reg = new RegExp('\\.' + ext + '$');
+            content && content.replace(/import\s*([{\w\d-_}]*)\s*from\s*['"](.*)['"]/ig, (match, name, importpath) => {
+                reg = new RegExp('\\' + ext + '$');
                 if (!reg.test(importpath))
                     importpath = importpath + ext;
                 
@@ -51,6 +54,9 @@ export default {
         });
         return util.unique(parents).filter((v) => v.indexOf('components') === -1);
     },
+    /**
+     * find src, <script src="">
+     */
     findReference (file) {
         let src = cache.getSrc();
         let files = util.getFiles(src);
@@ -58,7 +64,7 @@ export default {
 
         let refs = [];
 
-        let reg = new RegExp('\\.' + ext + '$');
+        let reg = new RegExp('\\' + ext + '$');
 
         files = files.filter((v) => reg.test(v));
 

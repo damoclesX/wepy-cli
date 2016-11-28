@@ -42,8 +42,7 @@ export default {
             src = comPath + '/index' + wpyExt;
         } else if (this.isFile(comPath + '/' + com + wpyExt)) {
             src = comPath + '/' + com + wpyExt;
-        } else 
-            throw new Error('Can not find components ' + comPath);
+        }
         return src;
     },
 

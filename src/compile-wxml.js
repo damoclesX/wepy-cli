@@ -121,11 +121,12 @@ export default {
                 throw new Error('Unknow component id');
 
             let src = util.findComponent(definePath);
+            if (!src) {
+                util.log('找不到组件：' + definePath, '错误');
+            } else {
+                node.replaceChild(this.compileXML(this.getTemplate(src), prefix ? `${prefix}$${comid}` : `${comid}`), com);    
+            }
 
-            //this.comPrefix[prefix ? `${prefix}$${comid}` : `$${comid}`] = this.comCount++;
-            //this.getPrefix(prefix ? `${prefix}$${comid}` : `$${comid}`);
-
-            node.replaceChild(this.compileXML(this.getTemplate(src), prefix ? `${prefix}$${comid}` : `${comid}`), com);
         };
         return node;
     },

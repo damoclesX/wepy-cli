@@ -28,11 +28,16 @@ export default {
             if (requires && requires.length) {
                 requires.forEach((r) => {
                     let comsrc = util.findComponent(r);
-                    let relative = path.relative(opath.dir + path.sep + opath.base, comsrc);
-                    let code = util.readFile(opath);
-                    if (/<style/.test(code)) {
-                        relative = relative.replace(ext, '.wxss').replace(/\\/ig, '/').replace('../', './');
-                        res.css = '@import "' + relative + '";\n' + res.css;
+
+                    if (!comsrc) {
+                        util.log('找不到组件：' + r, '错误');
+                    } else {
+                        let relative = path.relative(opath.dir + path.sep + opath.base, comsrc);
+                        let code = util.readFile(opath);
+                        if (/<style/.test(code)) {
+                            relative = relative.replace(ext, '.wxss').replace(/\\/ig, '/').replace('../', './');
+                            res.css = '@import "' + relative + '";\n' + res.css;
+                        }
                     }
                 });
             }
