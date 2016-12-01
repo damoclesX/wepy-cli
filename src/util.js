@@ -161,12 +161,23 @@ export default {
         let config = cache.getConfig();
         if (config)
             return config;
-        config = this.readFile(path.join(process.cwd(), path.sep + '.wepyrc'));
-        try {
-            config = JSON.parse(config);
-        } catch(e) {
-            config = null;
+
+        let configFile = path.join(this.currentDir, path.sep, 'wepy.config.js');
+        let configType = 'js';
+
+        if (!this.isFile(configFile)) {
+            configFile = path.join(this.currentDir, path.sep, '.wepyrc');
+
+            config = this.readFile(configFile);
+            try {
+                config = JSON.parse(config);
+            } catch(e) {
+                config = null;
+            }
+        } else {
+            config = require(configFile);
         }
+
         cache.setConfig(config);
         return config;
     },
