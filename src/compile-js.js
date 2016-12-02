@@ -3,6 +3,8 @@ import path from 'path';
 import util from './util';
 import cache from './cache';
 
+import loader from './plugins/loader';
+
 
 const currentPath = util.currentDir;
 const src = cache.getSrc();
@@ -23,9 +25,9 @@ export default {
     },
 
     resolveDeps (code, type, opath) {
-
-        let wpyExt = cache.getExt();
-
+        
+        let params = cache.getParams();
+        let wpyExt = params.wpyExt;
 
 
         return code.replace(/require\(['"]([\w\d_\-\.\/]+)['"]\)/ig, (match, lib) => {
@@ -100,8 +102,6 @@ export default {
                     gulp.src(source).pipe(change(compileJS)).pipe(gulp.dest(dirname));
                 }*/
             }
-            if (lib.indexOf('regenerator-runtime') > 1)
-                debugger;
             if (type === 'npm') {
                 if (lib[0] !== '.') {
                     resolved = path.join('..' + path.sep, path.relative(opath.dir, modulesPath), lib);
@@ -161,17 +161,23 @@ export default {
         }
         code = this.resolveDeps(code, type, opath);
 
+        let target;
         if (type !== 'npm') {
-            let target = util.getDistPath(opath, 'js', src, dist);
-            util.log('JS  : ' + path.relative(process.cwd(), target), '写入');
-            util.writeFile(target, code);
+            target = util.getDistPath(opath, 'js', src, dist);
         } else {
             code = this.npmHack(opath.base, code);
-            let target = path.join(npmPath, path.relative(modulesPath, path.join(opath.dir, opath.base)));
-            util.log('JS  : ' + path.relative(process.cwd(), target), '写入');
-            util.writeFile(target, code);
+            target = path.join(npmPath, path.relative(modulesPath, path.join(opath.dir, opath.base)));
         }
 
+        let plg = new loader(config.plugins, {
+            type: type,
+            code: code,
+            file: target,
+            done (rst) {
+                util.output('写入', rst.file);
+                util.writeFile(target, rst.code);
+            }
+        });
     }
 
 }

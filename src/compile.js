@@ -9,6 +9,8 @@ import cLess from './compile-less';
 import cSass from './compile-sass';
 import cJS from './compile-js';
 
+import loader from './plugins/loader';
+
 
 let watchReady = false;
 let preventDup = {};
@@ -114,9 +116,19 @@ export default {
             util.error('没有检测到.wepyrc文件, 请执行`wepy new demo`创建');
             return;
         }
+        config.noCache = config.rawArgs.indexOf('--no-cache') !== -1;
+
+        if (config.noCache) {
+            cache.clearBuildCache();
+        }
+
         let src = config.source || wepyrc.src || 'src';
         let dist = config.output || wepyrc.output || 'dist';
         let ext = config.wpyExt || wepyrc.wpyExt || '.wpy';
+
+        config.source = src;
+        config.dist = dist;
+        config.wpyExt = ext;
 
         if (ext.indexOf('.') === -1)
             ext = '.' + ext;
@@ -126,7 +138,7 @@ export default {
         let current = process.cwd();
         let files = file ? [file] : util.getFiles(src);
 
-
+        cache.setParams(config);
         cache.setSrc(src);
         cache.setDist(dist);
         cache.setExt(ext);
@@ -175,6 +187,7 @@ export default {
         let src = cache.getSrc();
         let dist = cache.getDist();
         let ext = cache.getExt();
+        let config = util.getConfig();
 
         if (!util.isFile(opath)) {
             util.error('文件不存在：' + getRelative(opath));
@@ -196,13 +209,20 @@ export default {
                     cJS.compile(null, 'js', opath);
                     break;
                 default:
-                    util.log('文件: ' + path.relative(process.cwd(), path.join(opath.dir, opath.base)), '拷贝');
+                    util.output('拷贝', path.join(opath.dir, opath.base));
                     util.copy(opath);
+
+                    let plg = new loader(config.plugins, {
+                        type: opath.ext.substr(1),
+                        code: null,
+                        file: util.getDistPath(opath),
+                        done (rst) {
+                        }
+                    });
             }
 
         } catch (e) {
             util.log(e, '错误');
-            console.log(e);
         }
     }
 }

@@ -5,6 +5,12 @@ let _buildCache = null;
 let _filelistCache = {};
 
 export default {
+    setParams (v) {
+        this._params = v;
+    },
+    getParams () {
+        return this._params;
+    },
     setExt (v) {
         this._ext = v;
     },
@@ -60,6 +66,9 @@ export default {
         let cache = this.getBuildCache();
         cache[file] = util.getModifiedTime(file);
         _buildCache = cache;
+    },
+    clearBuildCache() {
+        util.unlink(cachePath);
     },
     saveBuildCache() {
         util.writeFile(cachePath, JSON.stringify(_buildCache));

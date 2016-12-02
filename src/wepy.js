@@ -25,10 +25,20 @@ let displayVersion = () => {
 
 let generateProject = (name) => {
 
+    util.log('目录：' + name, '创建');
+
+    if (util.mkdir(name) !== true) {
+        util.error('创建目录失败。');
+        return;
+    }
+
+    process.chdir(name);
+    util.currentDir = process.cwd();
+
     let packagePath = path.join(util.currentDir, 'package.json');
 
     if (util.isFile(packagePath) || util.isDir(path.join(util.currentDir, 'src'))) {
-        util.log('目录不为空, 请请勿重复初始化', '错误');
+        util.error('目录不为空, 请请勿重复初始化', '错误');
         return;
     }
 
@@ -108,6 +118,7 @@ commander.option('-V', '显示版本号', () => {
 commander.option('-s, --source <source>', '源码目录');
 commander.option('-t, --target <target>', '生成代码目录');
 commander.option('-f, --file <file>', '待编译wpy文件');
+commander.option('--no-cache', '对于引用到的文件，即使无改动也会再次编译');
 commander.option('-w, --watch', '监听文件改动');
 /*
 commander.option('-m, --mode <mode>', 'project mode type(normal, module), default is module, used in `new` command', mode => {

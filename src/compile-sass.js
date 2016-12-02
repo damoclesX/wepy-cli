@@ -1,6 +1,6 @@
 import sass from 'node-sass';
 import path from 'path';
-
+import loader from './plugins/loader';
 import util from './util';
 import cache from './cache';
 
@@ -42,8 +42,17 @@ export default {
                 });
             }
             let target = util.getDistPath(opath, 'wxss', src, dist);
-            util.log('SASS: ' + path.relative(util.currentDir, target), '写入');
-            util.writeFile(target, res.css);
+            let plg = new loader(config.plugins, {
+                type: 'sass',
+                code: res.css,
+                file: target,
+                done (rst) {
+                    util.output('写入', rst.file, 'SASS');
+                    util.writeFile(target, rst.code);
+                }
+            });
+            /*util.log('SASS: ' + path.relative(util.currentDir, target), '写入');
+            util.writeFile(target, res.css);*/
         });
     }
 }

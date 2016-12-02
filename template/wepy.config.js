@@ -1,11 +1,8 @@
+
+let prod = process.env.NODE_ENV === 'production';
+
 module.exports = {
   "wpyExt": ".wpy",
-  "sass": {
-    "outputStyle": "compressed"
-  },
-  "less": {
-    "compress": true
-  },
   "babel": {
     "presets": [
       "es2015",
@@ -18,3 +15,30 @@ module.exports = {
     ]
   }
 };
+
+
+if (prod || true) {
+  // 压缩sass
+  module.exports['sass'] = {"outputStyle": "compressed"};
+  
+  // 压缩less
+  module.exports['less'] = {"compress": true};
+
+  // 压缩js
+  module.exports.plugins = {
+      'UglifyJsPlugin': {
+          filter: /\.js$/,
+          config: {
+              compress: {
+                  warnings: false
+              }
+          }
+      },
+      'TestPlugin': {
+          filter: /\.wxml$/,
+          config: {
+          }
+      }
+  };
+}
+

@@ -2,6 +2,7 @@ import {DOMParser, DOMImplementation} from 'xmldom';
 import path from 'path';
 import util from './util';
 import cache from './cache';
+import loader from './plugins/loader';
 
 const PREFIX = '$';
 const JOIN = '$';
@@ -132,12 +133,23 @@ export default {
     },
 
     compile (content, opath) {
+        let config = util.getConfig();
         let src = cache.getSrc();
         let dist = cache.getDist();
         let node = new DOMParser().parseFromString(content);
         node = this.compileXML(node);
         let target = util.getDistPath(opath, 'wxml', src, dist);
-        util.log('WXML: ' + path.relative(process.cwd(), target), '写入');
-        util.writeFile(target, util.decode(node.toString()));
+
+        let plg = new loader(config.plugins, {
+            type: 'wxml',
+            code: util.decode(node.toString()),
+            file: target,
+            done (rst) {
+                util.output('写入', rst.file);
+                util.writeFile(target, rst.code);
+            }
+        });
+        //util.log('WXML: ' + path.relative(process.cwd(), target), '写入');
+        //util.writeFile(target, util.decode(node.toString()));
     }
 }

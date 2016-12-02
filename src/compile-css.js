@@ -1,11 +1,12 @@
 import path from 'path';
 import fs from 'fs';
-
+import loader from './plugins/loader';
 import util from './util';
 import cache from './cache';
 
 export default {
     compile (content, requires, opath) {
+        let config = util.getConfig();
         let src = cache.getSrc();
         let dist = cache.getDist();
         let ext = cache.getExt();
@@ -33,7 +34,18 @@ export default {
             });
         }
         let target = util.getDistPath(opath, 'wxss', src, dist);
+
+        let plg = new loader(config.plugins, {
+            type: 'css',
+            code: content,
+            file: target,
+            done (rst) {
+                util.output('写入', rst.file);
+                util.writeFile(target, rst.code);
+            }
+        });
+        /*
         util.log('CSS : ' + path.relative(util.currentDir, target), '写入');
-        util.writeFile(target, content);
+        util.writeFile(target, content);*/
     }
 }

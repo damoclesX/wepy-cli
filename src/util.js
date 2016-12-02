@@ -21,10 +21,13 @@ colors.setTheme({
     '变更': 'bgYellow',
     '删除': 'bgMagenta',
     '执行': 'blue',
+    '压缩': 'blue',
     '信息': 'grey',
     '完成': 'green',
+    '创建': 'green',
     '监听': 'magenta',
     '错误': 'red',
+    '测试': 'red',
     '拷贝': 'yellow',
     '编译': 'blue',
     '写入': 'green'
@@ -120,6 +123,16 @@ export default {
         });
         return out;
     },
+    unlink (p) {
+        let rst = '';
+        p = (typeof(p) === 'object') ? path.join(p.dir, p.base) : p;
+        try {
+            rst = fs.unlinkSync(p);
+        } catch (e) {
+            rst = null;
+        }
+        return rst;
+    },
     readFile (p) {
         let rst = '';
         p = (typeof(p) === 'object') ? path.join(p.dir, p.base) : p;
@@ -127,6 +140,15 @@ export default {
             rst = fs.readFileSync(p, 'utf-8');
         } catch (e) {
             rst = null;
+        }
+        return rst;
+    },
+    mkdir (name) {
+        let rst = true;
+        try {
+            fs.mkdirSync(name);
+        } catch(e) {
+            rst = e;
         }
         return rst;
     },
@@ -243,10 +265,22 @@ export default {
                 //console.log();
             } else {
                 let fn = colors[type] ? colors[type] : colors['info'];
-                console.log(dateTime + colors[type](`[${type}]`) + ' ' + msg);
+                console.log(dateTime + fn(`[${type}]`) + ' ' + msg);
             }
         } else {
             console.log(dateTime + msg); 
         }
+    },
+    output (type, file, flag) {
+        if (!flag) {
+            flag = file.substr(file.lastIndexOf('.') + 1).toUpperCase();
+            if (flag.length < 4) {
+                let i = 4 - flag.length;
+                while (i--) {
+                    flag += ' ';
+                }
+            }
+        }
+        this.log(flag + ': ' + path.relative(this.currentDir, file), type);
     }
 }
