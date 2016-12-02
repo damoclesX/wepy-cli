@@ -35,7 +35,7 @@ if (prod || true) {
           }
       },
       'TestPlugin': {
-          filter: /\.wxml$/,
+          filter: /\.wxss$/,
           config: {
           }
       }
