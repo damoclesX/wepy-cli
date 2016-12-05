@@ -1,4 +1,4 @@
-<style type="less">
+<style lang="less">
     .counter {
       text-align: left;
       font-size: 12px;

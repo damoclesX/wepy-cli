@@ -54,7 +54,7 @@ export default {
         [].slice.call(xml.childNodes || []).forEach((child) => {
             if (child.nodeName === 'style' || child.nodeName === 'template' || child.nodeName === 'script') {
                 rst[child.nodeName].src = child.getAttribute('src');
-                rst[child.nodeName].type = child.getAttribute('type');
+                rst[child.nodeName].type = child.getAttribute('lang') || child.getAttribute('type');
 
                 if (rst[child.nodeName].src) {
                     rst[child.nodeName].src = path.resolve(opath.dir, rst[child.nodeName].src);

@@ -1,4 +1,4 @@
-<style type="less">
+<style lang="less">
     .panel {
         text-align: left;
         width: 100%;
