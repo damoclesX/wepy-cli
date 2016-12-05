@@ -8,28 +8,38 @@ import fs from 'fs';
 
 export default class {
 
-    constructor(config) {
-        this.config = config || {};
+    constructor(c = {}) {
+        const def = {
+            filter: new RegExp('\.(jpg|png|jpge)$'),
+            config: {
+                jpg: {},
+                png: {quality: '65-80'}
+            }
+        };
+
+        this.setting = Object.assign({}, def, c);
     }
     apply (op) {
-        util.output('压缩', op.file);
 
-        /*optimage({
-            inputFile: op.file,
-            outputFile: op.file + '.min.png'
-        }, (err, res) => {
-            debugger;
-        });*/
+        let setting = this.setting;
 
-        imagemin([op.file], '', {
-            plugins: [
-                imageminMozjpeg(),
-                imageminPngquant({quality: '65-80'})
-            ]
-        }).then((files) => {
-            fs.writeFile(op.file, files[0].data, function () {});
-        }).catch((e) => {
-        });
-        op.next(op);
+        if (!setting.filter.test(op.file)) {
+            op.next();
+        } else {
+            util.output('压缩', op.file);
+
+            imagemin([op.file], '', {
+                plugins: [
+                    imageminMozjpeg(this.setting.config.jpg),
+                    imageminPngquant(this.setting.config.png)
+                ]
+            }).then((files) => {
+                op.code = files[0].data;
+                op.next();
+            }).catch((e) => {
+                op.err = e;
+                op.catch();
+            });
+        }
     }
 }

@@ -253,6 +253,9 @@ export default {
     error (msg) {
         this.log(msg, 'error', false);
     },
+    warning (msg) {
+        this.log(msg, 'warning', false);
+    },
     log (msg, type, showTime = true) {
         let dateTime = showTime ? colors.gray(`[${this.datetime()}] `) : '';
         if(this.isObject(msg) || this.isArray(msg)){
@@ -262,6 +265,9 @@ export default {
             type = type.toUpperCase();
             if(type === 'ERROR'){
                 console.error(colors.red('[Error] ' + msg));
+                //console.log();
+            } else if(type === 'WARNING'){
+                console.error(colors.yellow('[WARNING] ' + msg));
                 //console.log();
             } else {
                 let fn = colors[type] ? colors[type] : colors['info'];

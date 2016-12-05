@@ -5,16 +5,30 @@ import util from './../util';
 
 export default class {
 
-    constructor(config) {
-        this.config = config || {};
+    constructor(c = {}) {
+        const def = {
+            filter: new RegExp('\.(js)$'),
+            config: {
+                compress: {warnings: false}
+            }
+        };
+
+        this.setting = Object.assign({}, def, c);
     }
     apply (op) {
-        util.output('压缩', op.file);
-        this.config.fromString = true;
-        let rst = uglify.minify(op.code, this.config);
-        let k;
-        for (k in rst)
-            op[k] = rst[k];
-        op.next(op);
+
+        let setting = this.setting;
+
+        if (!setting.filter.test(op.file)) {
+            op.next();
+        } else {
+            util.output('压缩', op.file);
+            this.setting.config.fromString = true;
+            let rst = uglify.minify(op.code, this.setting.config);
+            let k;
+            for (k in rst)
+                op[k] = rst[k];
+            op.next();
+        }
     }
 }

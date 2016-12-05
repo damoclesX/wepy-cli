@@ -210,13 +210,23 @@ export default {
                     break;
                 default:
                     util.output('拷贝', path.join(opath.dir, opath.base));
-                    util.copy(opath);
+                    //util.copy(opath);
 
                     let plg = new loader(config.plugins, {
                         type: opath.ext.substr(1),
                         code: null,
-                        file: util.getDistPath(opath),
+                        file: path.join(opath.dir, opath.base),
                         done (rst) {
+                            if (rst.code) {
+                                let target = util.getDistPath(path.parse(rst.file));
+                                util.writeFile(target, rst.code);
+                            } else {
+                                util.copy(path.parse(rst.file));
+                            }
+                        },
+                        error (rst) {
+                            util.warning(rst.err);
+                            util.copy(path.parse(rst.file));
                         }
                     });
             }
