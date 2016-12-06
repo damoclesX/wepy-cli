@@ -52,11 +52,17 @@
             <view class="testtitle">测试数据绑定</view>
             <text class="testinfo">{{normalTitle}}</text>
             <text class="testinfo">{{setTimeoutTitle}}</text>
+            <text class="testinfo">{{mixin}}</text>
         </view>
         <view class="testarea">
             <view class="testtitle">测试组件通信</view>
-            <button bindtap="counter1plus" size="mini"> 点我修改组件 </button>
+            <button bindtap="communicate" size="mini"> 点我修改组件 </button>
         </view>
+        <view class="testarea">
+            <view class="testtitle">测试混合</view>
+            <button bindtap="tap" size="mini"> 混合TAP事件 </button>
+        </view>
+        
         
         <view class="testarea">
             <view class="testtitle">测试并发网络请求</view>
@@ -99,7 +105,9 @@
     import wepy from 'wepy';
     import List from '../components/list';
     import Panel from '../components/panel';
-    import Counter from '../components/counter';
+    import Counter from '../components/counter';    
+
+    import testMixin from '../mixins/test';
 
     export default class Index extends wepy.page {
 
@@ -113,6 +121,8 @@
             list: List
         };
 
+        mixins = [testMixin];
+
         data = {
             userInfo: {
                 nickName: '加载中...'
@@ -123,7 +133,12 @@
             netrst: ''
         };
         methods = {
-            counter1plus () {
+            tap () {
+                console.log('do noting from ' + this.name);
+            },
+            communicate () {
+
+                console.log(this.name + ' tap');
 
                 this.$invoke('/panel/counter1', 'plus', 45, 6);
                 this.$invoke('counter2', 'minus', 45, 6);
