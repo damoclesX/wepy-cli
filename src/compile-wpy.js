@@ -60,7 +60,7 @@ export default {
                     rst[child.nodeName].src = path.resolve(opath.dir, rst[child.nodeName].src);
                 }
 
-                if (util.isFile(rst[child.nodeName].src)) {
+                if (rst[child.nodeName].src && util.isFile(rst[child.nodeName].src)) {
                     rst[child.nodeName].code = util.readFile(rst[child.nodeName].src, 'utf-8');
                     if (rst[child.nodeName].code === null) {
                         throw '打开文件失败: ' + rst[child.nodeName].src;
@@ -117,7 +117,11 @@ export default {
             throw new Error('打开文件失败: ' + filepath);
             return;
         }
-        content = util.encode(content, content.indexOf('<script>') + 9, content.indexOf('</script>') - 1);
+        let startlen = content.indexOf('<script') + 7;
+        while(content[startlen++] !== '>') {
+            // do nothing;
+        }
+        content = util.encode(content, startlen, content.indexOf('</script>') - 1);
         let doc = new DOMParser().parseFromString(content);
 
         let type = '';
