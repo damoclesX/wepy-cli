@@ -54,6 +54,37 @@ export default {
         return char !== '';
     },
 
+    getFunctionInfo (str) {
+        let rst = {name: '', params: []}, char = '', tmp = '', stack = [];
+        for (let i = 0, len = str.length; i < len; i++) {
+            char = str[i];
+            if (!rst.name) {
+                if (char === '(') {
+                    rst.name = tmp;
+                    tmp = '';
+                    continue;
+                }
+            }
+            if ((char === ',' || char === ')') && stack.length === 0) {
+                let p = tmp.replace(/^\s*/ig, '').replace(/\s*$/ig, '');
+                if (p && (p[0] === '"' || p[0] === "'") && p[0] === p[p.length - 1]) {
+                    p = p.substring(1, p.length - 1);
+                }
+                rst.params.push(p);
+                tmp = '';
+                continue;
+            }
+            if (char === "'" || char === '"') {
+                if (stack.length && stack[stack.length - 1] === char)
+                    stack.pop();
+                else
+                    stack.push(char);
+            }
+            tmp += char;
+        }
+        return rst;
+    },
+
     parseExp (content, prefix, ignores) {
         let comid = this.getPrefix(prefix);
         // replace {{ param ? 'abc' : 'efg' }} => {{ $prefix_param ? 'abc' : 'efg' }}
@@ -94,6 +125,11 @@ export default {
                 }
                 // bindtap="abc" => bindtap="prefix_abc"
                 if (attr.name.indexOf('bind') === 0 || attr.name.indexOf('catch') === 0) {
+                    if (attr.value.indexOf('(') > 0) {  // method('{{p}}', 123);
+                        let funcInfo = this.getFunctionInfo(attr.value);
+                        attr.value = funcInfo.name;
+                        node.setAttribute('data-wepy-params', funcInfo.params.join('-'));
+                    }
                     attr.value = `${PREFIX}${comid}${JOIN}` + attr.value;
                 }
             });

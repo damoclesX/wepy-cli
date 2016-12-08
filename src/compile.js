@@ -201,6 +201,7 @@ export default {
                     break;
                 case '.less':
                     cLess.compile(opath);
+                    break;
                 case '.sass':
                 case '.scss':
                     cSass.compile(opath);
